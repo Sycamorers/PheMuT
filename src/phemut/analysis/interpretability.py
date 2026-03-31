@@ -11,11 +11,11 @@ import torch
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
 
-from phymut.paths import output_dir
-from phymut.forecasting.models.build import build_model
-from phymut.forecasting.utils.dataloader import load_dataset, load_and_clean_gt
-from phymut.forecasting.utils.dir_utils import build_paths
-from phymut.forecasting.utils.weather_embed_utils import load_weather_embedding_multi
+from phemut.paths import output_dir
+from phemut.forecasting.models.build import build_model
+from phemut.forecasting.utils.dataloader import load_dataset, load_and_clean_gt
+from phemut.forecasting.utils.dir_utils import build_paths
+from phemut.forecasting.utils.weather_embed_utils import load_weather_embedding_multi
 
 
 @dataclass(frozen=True)
@@ -258,7 +258,7 @@ def compute_permutation_importance(
     num_epochs: int,
     seed: int = 42,
 ) -> Tuple[pd.DataFrame, List[str]]:
-    from phymut.forecasting.utils.build_sequences import create_multistep_sequences
+    from phemut.forecasting.utils.build_sequences import create_multistep_sequences
 
     np.random.seed(seed)
     torch.manual_seed(seed)

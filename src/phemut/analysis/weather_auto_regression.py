@@ -183,7 +183,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from phymut.paths import data_dir
+from phemut.paths import data_dir
 # ───────────────────────── Batch grid ─────────────────────────
 SEASONS      = ["2324", "2425"]  # add/remove seasons here
 FEATURE_COLS = [

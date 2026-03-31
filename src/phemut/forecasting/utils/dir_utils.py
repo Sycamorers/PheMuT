@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import Dict
 
-from phymut.paths import data_dir
+from phemut.paths import data_dir
 
 
 def build_paths(year_tag: str) -> Dict[str, Path]:

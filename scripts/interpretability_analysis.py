@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 from datetime import date
 
-from phymut.analysis.interpretability import (
+from phemut.analysis.interpretability import (
     InterpretabilityConfig,
     run_lagged_correlation_analysis,
     run_permutation_importance_analysis,
 )
-from phymut.paths import output_dir
+from phemut.paths import output_dir
 
 
 def main() -> None:

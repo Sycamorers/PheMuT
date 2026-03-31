@@ -1,29 +1,30 @@
 # PheMuT: A Phenology-Informed, Multi-Modal Time-Series Model for Strawberry Yield Forecasting
 
+![PheMuT pipeline overview](assets/ppline.png)
 
-This repository contains the code for the PhyMuT strawberry yield forecasting
-pipeline used in the paper. It includes:
+## Overview
+PheMuT integrates multi-season visual phenotyping data, canopy geometry estimates, and high-frequency meteorological observations to deliver multi-week strawberry yield forecasts. The pipeline marries state-of-the-art computer vision (dual YOLOv11 detectors, ByteTrack, SAM, Depth Anything v2) with a self-supervised autoregressive temporal convolutional network (TCN) that compresses weather time series into informative embeddings. The resulting fused representation supports nuanced, phenology-aware forecasting that is robust to rapid crop transitions typical of commercial strawberry production.
 
-- Multi-season yield forecasting models (sequence-based predictors)
-- Weather embedding training for auxiliary features
-- Data diagnostics and analysis scripts
+Use this repository to reproduce the analyses from Huang *et al.* (2026), extend the model to new seasons, or adapt the architecture to related specialty crops.
 
-Raw image data and processed data tables are not included. Please request data
-access from the authors as described in `data/README.md`.
+## Key Capabilities
+- **Phenology-centric forecasting**: Encodes flower/fruit developmental stages and canopy morphology to preserve crop context across horizons.
+- **Multi-modal fusion**: Couples visual detections with learned weather embeddings for resilient, data-efficient predictions.
+- **Reproducible experiments**: Provides ready-to-run scripts for forecasting, diagnostics, interpretability, and weather embedding training.
+- **Interpretability tooling**: Supplies lagged correlations and permutation-importance analyses to explain feature utility across horizons.
 
-## Project layout
+## Repository Layout
+- `src/phemut/`: core library code
+  - `forecasting/`: experiment drivers, model definitions, training/evaluation helpers
+  - `analysis/`: diagnostics, interpretability, and weather embedding modules
+- `scripts/`: thin entry points that configure `PYTHONPATH` and invoke the library modules
+- `data/`: (not versioned) expected location for processed field data and learned embeddings
+- `outputs/`: auto-created directory for metrics, plots, and logs
+- `assets/`: figures used in documentation (e.g., `assets/ppline.png` shown above)
+- `docs/`: supplementary material, including the original citation snapshot (`docs/citation.html`)
 
-- `src/phymut/`: core library code
-  - `forecasting/`: models, training, and evaluation
-  - `analysis/`: dataset diagnostics and weather embedding training
-- `scripts/`: runnable entry points
-- `data/`: (not included) datasets and weather embeddings
-- `outputs/`: generated results and plots
-- `archive/`: legacy outputs and experiments (local only, ignored by git)
-
-## Data expectations
-
-After access is granted, arrange files like this:
+## Data Access & Organization
+Raw imagery, canopy reconstructions, and cleaned yield tables are proprietary to the authors. Request access as described in `data/README.md`, then arrange the folder structure as follows:
 
 ```
 data/
@@ -46,111 +47,50 @@ data/
       model.pth
 ```
 
-The `weather_allout/` directory can be generated with the weather embedding
-script if it is not provided.
+The `weather_allout/` artifacts can be regenerated with `scripts/weather_auto_regression.py` if they are not distributed with your data package.
 
-## Setup
-
-Recommended environment:
-
-- Python 3.10+
-- PyTorch
-- numpy, pandas, scikit-learn, matplotlib, adjustText
-
-Example install (CPU-only):
+## Environment Setup
+PheMuT targets Python 3.10+ with PyTorch, NumPy, pandas, scikit-learn, matplotlib, and adjustText. Install the dependencies with
 
 ```
 pip install torch numpy pandas scikit-learn matplotlib adjustText
 ```
 
-## Running experiments
+For GPU execution, follow the [official PyTorch installation selector](https://pytorch.org/get-started/locally/) to match your CUDA toolkit.
 
-All entry points live in `scripts/` and manage paths automatically.
+## Running Experiments
+All experiments are launched from the `scripts/` directory; each script sets up paths before delegating to the `phemut` modules.
 
-Forecasting (single-process):
+| Task | Command |
+| --- | --- |
+| Baseline yield forecasting | `python scripts/run_yield_forecast.py` |
+| Batched/multi-model forecasts | `python scripts/run_parallel_models.py` |
+| Weather embedding training | `python scripts/weather_auto_regression.py` |
+| Data diagnostics & plots | `python scripts/data_analysis.py` |
+| Interpretability suite | `PYTHONPATH=src python scripts/interpretability_analysis.py` |
 
-```
-python scripts/run_yield_forecast.py
-```
-
-Forecasting (multi-model parallel runs):
-
-```
-python scripts/run_parallel_models.py
-```
-
-Data diagnostics (plots and summary tables):
-
-```
-python scripts/data_analysis.py
-```
-
-Interpretability (lagged correlations + permutation importance):
-
-```
-PYTHONPATH=src python scripts/interpretability_analysis.py
-```
-
-Weather embedding training:
-
-```
-python scripts/weather_auto_regression.py
-```
+Adjust configuration constants inside the corresponding modules (`src/phemut/forecasting` and `src/phemut/analysis`) to tailor seasons, horizons, feature sets, or training hyperparameters.
 
 ## Outputs
+Generated artifacts are written under `outputs/`:
+- `outputs/forecasting/results/`: forecast curves, tables, and derived metrics
+- `outputs/forecasting/logs/`: process- and seed-specific logs for distributed runs
+- `outputs/analysis_plots/`: diagnostics for season quality assurance and embedding sanity checks
+- `outputs/interpretability/`: lagged correlation heatmaps, permutation-importance plots, and CSV exports
 
-All generated artifacts are written under `outputs/`:
+## Interpretability Details
+The interpretability toolkit combines two complementary analyses:
+1. **Lagged correlations** compute Pearson correlations between each feature at week `t` and yield at future horizons `t + h`, yielding season-specific heatmaps plus tabular exports (`outputs/interpretability/lagged_corr_*.png`, `.csv`).
+2. **Permutation importance** trains a lightweight LSTM surrogate, permutes each feature channel, and tracks RMSE degradation across horizons, producing plots (`perm_importance_*.png`) and ranking tables.
 
-- `outputs/forecasting/results/`: prediction plots and metrics
-- `outputs/forecasting/logs/`: parallel run logs
-- `outputs/analysis_plots/`: diagnostic plots and CSV summaries
-- `outputs/interpretability/`: lagged correlation plots, permutation importance plots,
-  and CSV summaries for interpretability
-
-## Interpretability details
-
-The interpretability script runs two complementary analyses:
-
-1) Lagged correlation analysis
-   - Computes Pearson correlations between each feature at week `t` and yield at
-     week `t+h`, for each forecast horizon `h`.
-   - Uses the same feature set as the forecasting model: phenology counts
-     (`strawberry_flower`, `strawberry_green`, `strawberry_white`,
-     `strawberry_pink`), canopy metrics (`Area`, `Volume`), and 8 PCA components
-     of the weather embedding (`weather_pc1..8`).
-   - Produces per-season heatmaps and a CSV table:
-     `outputs/interpretability/lagged_corr_2324.png`,
-     `outputs/interpretability/lagged_corr_2425.png`,
-     `outputs/interpretability/lagged_correlations.csv`.
-
-2) Permutation importance (model attribution)
-   - Trains a lightweight LSTM on the same inputs as the main pipeline and then
-     permutes one feature at a time across plots (preserving the time axis).
-   - Reports the RMSE delta per horizon and overall, capturing how much each
-     feature degrades forecast performance when shuffled.
-   - Outputs:
-     `outputs/interpretability/perm_importance_2324_seq4.png`,
-     `outputs/interpretability/perm_importance_2425_seq4.png`,
-     `outputs/interpretability/permutation_importance.csv`,
-     `outputs/interpretability/permutation_importance_topk.csv`.
-
-### Configuration (edit `scripts/interpretability_analysis.py`)
-
-- `input_rows`: feature list used for phenology/canopy inputs.
-- `horizons_by_season`: correlation horizons to evaluate.
-- `seq_len_by_season`: training sequence length.
-- `forecast_len_by_season`: derived from `horizons_by_season`.
-- `model_name`, `hid_dim`, `num_layers`, `lr`, `num_epochs`: attribution model
-  hyperparameters.
-- `feature_label_map` and `feature_label_order`: enforce consistent feature names
-  and ordering (F, G, W, P, Area, Volume, weather_0..weather_7).
-
-## Notes for reproducibility
-
-- The code expects the dated subfolders to be named as `YYMMDD`.
-- Ground-truth CSVs are loaded from `counting_yield/` inside each season.
-- Weather embeddings are loaded from `data/weather_allout/<season>/embed.npy`.
+Adjust inputs (`input_rows`), horizons (`horizons_by_season`), sequence lengths, and hyperparameters directly in `scripts/interpretability_analysis.py` to match the season or modality mix you wish to study.
 
 ## Citation
+If PheMuT informs your research, please cite the original article:
 
-If you use this code, please cite the corresponding paper.
+> Huang, Z., Lee, W. S., Ampatzidis, Y., Agehara, S., & Peres, N. A. (2026). *PheMuT: A phenology-informed, multi-modal time-series model for strawberry yield forecasting*. Computers and Electronics in Agriculture, 244, 111526.
+
+A copy of the ScienceDirect citation metadata and abstract is preserved in `docs/citation.html` for reference (access via University of Florida libraries). When sharing derived work, refer to that file or the journal page to ensure the metadata stays authoritative.
+
+## Contact
+For collaboration requests, dataset access, or integration questions, please reach out to the corresponding author listed in the paper or open an issue in this repository.

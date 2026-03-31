@@ -7,7 +7,7 @@ import os
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
-from phymut.paths import output_dir
+from phemut.paths import output_dir
 from .utils.dataloader import load_dataset, load_gt_means
 from .utils.build_sequences import create_multistep_sequences
 from .utils.dir_utils import build_paths

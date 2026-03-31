@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
 
-from phymut.paths import data_dir, output_dir
+from phemut.paths import data_dir, output_dir
 
 plt.rcParams.update({
     "xtick.labelsize": 22, # x 轴数字

@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import sys
 
-from phymut.paths import output_dir, PROJECT_ROOT
+from phemut.paths import output_dir, PROJECT_ROOT
 
 # List of models to run in parallel
 # MODELS = ["lstm", "gru", "transformer", "nbeats", "rnn", "s2s", "tcn", "mamba"]

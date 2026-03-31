@@ -7,7 +7,7 @@ from typing import List
 import numpy as np
 import pandas as pd
 
-from phymut.paths import data_dir
+from phemut.paths import data_dir
 
 DATE_FMT = "%y%m%d"
 FEATURE_TAG_RE = re.compile(r"[^\w]+")
