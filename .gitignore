@@ -13,6 +13,16 @@ archive/
 *.npy
 *.npz
 
-# Data (keep README only)
+# Data
 data/*
 !data/README.md
+!data/2324_GNV_processed/
+data/2324_GNV_processed/**/*
+!data/2324_GNV_processed/**/
+!data/2324_GNV_processed/*.csv
+!data/2324_GNV_processed/**/*.csv
+!data/2425_GNV_processed/
+data/2425_GNV_processed/**/*
+!data/2425_GNV_processed/**/
+!data/2425_GNV_processed/*.csv
+!data/2425_GNV_processed/**/*.csv

@@ -18,13 +18,16 @@ Use this repository to reproduce the analyses from Huang *et al.* (2026), extend
   - `forecasting/`: experiment drivers, model definitions, training/evaluation helpers
   - `analysis/`: diagnostics, interpretability, and weather embedding modules
 - `scripts/`: thin entry points that configure `PYTHONPATH` and invoke the library modules
-- `data/`: (not versioned) expected location for processed field data and learned embeddings
+- `data/`: versioned processed tabular field data plus local-only raw data or learned embeddings
 - `outputs/`: auto-created directory for metrics, plots, and logs
 - `assets/`: figures used in documentation (e.g., `assets/ppline.png` shown above)
 - `docs/`: supplementary material, including the original citation snapshot (`docs/citation.html`)
 
 ## Data Access & Organization
-Raw imagery, canopy reconstructions, and cleaned yield tables are proprietary to the authors. Request access as described in `data/README.md`, then arrange the folder structure as follows:
+This repository includes the processed tabular CSV files used by the forecasting
+experiments. Raw imagery, image-derived frame outputs, canopy reconstructions,
+learned embeddings, and model weights are not versioned. If you have access to
+those local artifacts, arrange the folder structure as follows:
 
 ```
 data/
